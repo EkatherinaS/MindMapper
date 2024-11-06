@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MindMapper.WebApi.Data;
+using MindMapper.WebApi.Services;
+using MindMapper.WebApi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IFileService, FileService>();
 
 var app = builder.Build();
 

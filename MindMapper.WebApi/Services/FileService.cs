@@ -27,6 +27,7 @@ namespace MindMapper.WebApi.Services
                 {
                     fileData.CopyTo(stream);
                     fileDetails.FileData = stream.ToArray();
+
                 }
 
              //   var result = dbContextClass.FileDetails.Add(fileDetails);
