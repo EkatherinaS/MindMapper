@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.Extensions.Configuration;
 
 namespace MindMapper.WebApi.Data;
 
@@ -9,6 +10,7 @@ public class ApplicationDbContextFactory : IDesignTimeDbContextFactory<Applicati
     {
         var configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json", false)
+            .AddEnvironmentVariables()
             .Build();
         
         var connectionString = configuration.GetConnectionString("DefaultConnection");
