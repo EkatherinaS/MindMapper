@@ -1,5 +1,8 @@
 ﻿using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
+using System.Text.RegularExpressions;
+using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
+using UglyToad.PdfPig;
 
 namespace MindMapper.WebApi.Services
 {
@@ -28,10 +31,29 @@ namespace MindMapper.WebApi.Services
                     fileData.CopyTo(stream);
                     fileDetails.FileData = stream.ToArray();
 
+
                 }
 
-             //   var result = dbContextClass.FileDetails.Add(fileDetails);
-             //   await dbContextClass.SaveChangesAsync();
+                using (var pdf = PdfDocument.Open(fileDetails.FileData))
+                {
+                    foreach (var page in pdf.GetPages())
+                    {
+                        // Either extract based on order in the underlying document with newlines and spaces.
+                        var text = ContentOrderTextExtractor.GetText(page);
+
+                        text = Regex.Replace(text, @"[^\w\s]", string.Empty);
+                        // Or based on grouping letters into words.
+                        var otherText = string.Join(" ", page.GetWords());
+
+                        // Or the raw text of the page's content stream.
+                        var rawText = page.Text;
+
+                    }
+
+                }
+
+                //   var result = dbContextClass.FileDetails.Add(fileDetails);
+                //   await dbContextClass.SaveChangesAsync();
             }
             catch (Exception)
             {
