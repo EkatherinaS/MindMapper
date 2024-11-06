@@ -15,7 +15,7 @@ namespace MindMapper.WebApi.Services
         //    this.dbContextClass = dbContextClass;
         //}
 
-        public async Task PostFileAsync(IFormFile fileData, FileType fileType)
+        public async Task PostFileAsync(IFormFile fileData)
         {
             try
             {
@@ -23,7 +23,6 @@ namespace MindMapper.WebApi.Services
                 {
                     ID = 0,
                     FileName = fileData.FileName,
-                    FileType = fileType,
                 };
 
                 using (var stream = new MemoryStream())
@@ -71,7 +70,6 @@ namespace MindMapper.WebApi.Services
                     {
                         ID = 0,
                         FileName = file.FileDetails.FileName,
-                        FileType = file.FileType,
                     };
 
                     using (var stream = new MemoryStream())

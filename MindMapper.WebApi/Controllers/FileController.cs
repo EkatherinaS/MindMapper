@@ -33,7 +33,7 @@ namespace MindMapper.WebApi.Controllers
 
             try
             {
-                await _uploadService.PostFileAsync(fileDetails.FileDetails, fileDetails.FileType);
+                await _uploadService.PostFileAsync(fileDetails.FileDetails);
                 return Ok();
             }
             catch (Exception)
