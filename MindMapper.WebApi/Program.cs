@@ -8,6 +8,8 @@ using MindMapper.WebApi.Data.Entities;
 using MindMapper.WebApi.Options;
 using MindMapper.WebApi.Services;
 using MindMapper.WebApi.Services.Interfaces;
+using MindMapper.WebApi.Services;
+using MindMapper.WebApi.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +27,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
+builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.Configure<YandexGptOptions>(builder.Configuration.GetRequiredSection("YandexGptOptions"));
 

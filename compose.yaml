@@ -1,0 +1,11 @@
+services:
+  mind-mapper-back:
+    build: .
+    container_name: mind-mapper-back
+    restart: unless-stopped
+    ports:
+      - 54401:5432
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+
