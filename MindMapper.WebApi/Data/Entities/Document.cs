@@ -10,4 +10,6 @@ public class Document
 
     public string OriginalName { get; set; }
     public virtual ICollection<Topic> Topics { get; set; }
+
+    public bool IsCompleted => Topics.All(x => x.AnalysisCompleted);
 }

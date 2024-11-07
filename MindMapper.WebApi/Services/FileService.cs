@@ -1,118 +1,48 @@
 ﻿using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
-using System.Text.RegularExpressions;
-using UglyToad.PdfPig.DocumentLayoutAnalysis.TextExtractor;
-using UglyToad.PdfPig;
+using Microsoft.Extensions.Options;
+using MindMapper.WebApi.Data;
+using MindMapper.WebApi.Data.Entities;
+using FileOptions = MindMapper.WebApi.Options.FileOptions;
 
-namespace MindMapper.WebApi.Services
+namespace MindMapper.WebApi.Services;
+
+public class FileService : IFileService
 {
-    public class FileService : IFileService
+    private readonly IOptions<FileOptions> _fileOptions;
+    private readonly ApplicationDbContext _context;
+
+    public FileService(IOptions<FileOptions> fileOptions, ApplicationDbContext context)
     {
-        //private readonly DbContextClass dbContextClass;
+        _fileOptions = fileOptions;
+        _context = context;
+    }
 
-        //public FileService(DbContextClass dbContextClass)
-        //{
-        //    this.dbContextClass = dbContextClass;
-        //}
+    public async Task PostFileAsync(IFormFile fileData)
+    {
+        var newName = $"{Guid.NewGuid()}.pdf";
+        var originalName = fileData.FileName;
 
-        public async Task PostFileAsync(IFormFile fileData)
+        await using var stream = fileData.OpenReadStream();
+        using var memStream = new MemoryStream();
+        await stream.CopyToAsync(memStream);
+
+        var resultPath = Path.Combine(_fileOptions.Value.SavePath, newName);
+        await File.WriteAllBytesAsync(resultPath, memStream.ToArray());
+
+        var document = new Document
         {
-            try
-            {
-                var fileDetails = new FileDetails()
-                {
-                    ID = 0,
-                    FileName = fileData.FileName,
-                };
+            SavedName = newName,
+            OriginalName = originalName
+        };
 
-                using (var stream = new MemoryStream())
-                {
-                    fileData.CopyTo(stream);
-                    fileDetails.FileData = stream.ToArray();
+        await _context.Documents.AddAsync(document);
+        await _context.SaveChangesAsync();
+    }
 
-
-                }
-
-                using (var pdf = PdfDocument.Open(fileDetails.FileData))
-                {
-                    foreach (var page in pdf.GetPages())
-                    {
-                        // Either extract based on order in the underlying document with newlines and spaces.
-                        var text = ContentOrderTextExtractor.GetText(page);
-
-                        text = Regex.Replace(text, @"[^\w\s]", string.Empty);
-                        // Or based on grouping letters into words.
-                        var otherText = string.Join(" ", page.GetWords());
-
-                        // Or the raw text of the page's content stream.
-                        var rawText = page.Text;
-
-                    }
-
-                }
-
-                //   var result = dbContextClass.FileDetails.Add(fileDetails);
-                //   await dbContextClass.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        public async Task PostMultiFileAsync(List<FileUploadModel> fileData)
-        {
-            try
-            {
-                foreach (FileUploadModel file in fileData)
-                {
-                    var fileDetails = new FileDetails()
-                    {
-                        ID = 0,
-                        FileName = file.FileDetails.FileName,
-                    };
-
-                    using (var stream = new MemoryStream())
-                    {
-                        file.FileDetails.CopyTo(stream);
-                        fileDetails.FileData = stream.ToArray();
-                    }
-
-                 //   var result = dbContextClass.FileDetails.Add(fileDetails);
-                }
-               // await dbContextClass.SaveChangesAsync();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
-        }
-
-        //public async Task DownloadFileById(int Id)
-        //{
-        //    try
-        //    {
-        //        var file = dbContextClass.FileDetails.Where(x => x.ID == Id).FirstOrDefaultAsync();
-
-        //        var content = new System.IO.MemoryStream(file.Result.FileData);
-        //        var path = Path.Combine(
-        //           Directory.GetCurrentDirectory(), "FileDownloaded",
-        //           file.Result.FileName);
-
-        //        await CopyStream(content, path);
-        //    }
-        //    catch (Exception)
-        //    {
-        //        throw;
-        //    }
-        //}
-
-        public async Task CopyStream(Stream stream, string downloadPath)
-        {
-            using (var fileStream = new FileStream(downloadPath, FileMode.Create, FileAccess.Write))
-            {
-                await stream.CopyToAsync(fileStream);
-            }
-        }
+    public async Task PostMultiFileAsync(List<FileUploadModel> fileData)
+    {
+        var tasks = fileData.Select(file => PostFileAsync(file.FileDetails));
+        await Task.WhenAll(tasks);
     }
 }

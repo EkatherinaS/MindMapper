@@ -29,6 +29,7 @@ public class TopicsService : ITopicsService
         return new DocumentModel(
             DocumentId: document.Id,
             IsReady: document.Topics.All(x => x.AnalysisCompleted),
+            Name: document.OriginalName,
             Topics: document
                 .Topics
                 .Select(x => new TopicModel(x.Id, x.Name, x.Text, x.PreviousTopicId))

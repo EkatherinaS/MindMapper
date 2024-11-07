@@ -10,6 +10,7 @@ using MindMapper.WebApi.Services;
 using MindMapper.WebApi.Services.Interfaces;
 using MindMapper.WebApi.Services;
 using MindMapper.WebApi.Services.Interfaces;
+using FileOptions = MindMapper.WebApi.Options.FileOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped<IFileService, FileService>();
 
 builder.Services.Configure<YandexGptOptions>(builder.Configuration.GetRequiredSection("YandexGptOptions"));
+builder.Services.Configure<FileOptions>(builder.Configuration.GetRequiredSection("FileOptions"));
 
 var app = builder.Build();
 

@@ -1,13 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
-using System.Net;
-
 
 namespace MindMapper.WebApi.Controllers
 {
 
-    [Route("api/[controller]")]
+    [Route("api/files")]
     [ApiController]
     public class FilesController : ControllerBase
     {
@@ -26,20 +24,13 @@ namespace MindMapper.WebApi.Controllers
         [HttpPost("PostSingleFile")]
         public async Task<ActionResult> PostSingleFile([FromForm] FileUploadModel fileDetails)
         {
-            if (fileDetails == null)
+            if (fileDetails?.FileDetails == null || !fileDetails.FileDetails.FileName.EndsWith(".pdf"))
             {
                 return BadRequest();
             }
 
-            try
-            {
-                await _uploadService.PostFileAsync(fileDetails.FileDetails);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _uploadService.PostFileAsync(fileDetails.FileDetails);
+            return Ok();
         }
 
         /// <summary>
@@ -50,22 +41,13 @@ namespace MindMapper.WebApi.Controllers
         [HttpPost("PostMultipleFile")]
         public async Task<ActionResult> PostMultipleFile([FromForm] List<FileUploadModel> fileDetails)
         {
-            if (fileDetails == null)
+            if (fileDetails.Any(x => x.FileDetails is null) || fileDetails.Any(x => !x.FileDetails.FileName.EndsWith(".pdf")))
             {
                 return BadRequest();
             }
 
-            try
-            {
-                await _uploadService.PostMultiFileAsync(fileDetails);
-                return Ok();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            await _uploadService.PostMultiFileAsync(fileDetails);
+            return Ok();
         }
-
-
     }
 }

@@ -7,7 +7,5 @@ namespace MindMapper.WebApi.Services.Interfaces
         public Task PostFileAsync(IFormFile fileData);
 
         public Task PostMultiFileAsync(List<FileUploadModel> fileData);
-
-       // public Task DownloadFileById(int fileName);
     }
 }
