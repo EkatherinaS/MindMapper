@@ -31,7 +31,7 @@ public class TopicsService : ITopicsService
             IsReady: document.Topics.All(x => x.AnalysisCompleted),
             Topics: document
                 .Topics
-                .Select(x => new TopicModel(x.Id, x.Name, x.Text))
+                .Select(x => new TopicModel(x.Id, x.Name, x.Text, x.PreviousTopicId))
                 .ToArray()
         );
     }
