@@ -11,5 +11,3 @@ services:
       POSTGRES_USER: 'pguser'
       POSTGRES_PASSWORD: 'pguserpass'
       POSTGRES_DB: 'mindmapper_db'
-    networks:
-      - db-accesss
