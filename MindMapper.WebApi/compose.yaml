@@ -1,0 +1,13 @@
+services:
+  database:
+    container_name: database_mindmapper
+    image: postgres:16.0
+    restart: unless-stopped
+    volumes:
+      - /home/worker/pgdata:/var/lib/postgresql/data/
+    ports:
+      - 54401:5432
+    environment:
+      POSTGRES_USER: 'pguser'
+      POSTGRES_PASSWORD: 'pguserpass'
+      POSTGRES_DB: 'mindmapper_db'
