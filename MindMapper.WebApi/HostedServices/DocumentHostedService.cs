@@ -1,4 +1,3 @@
-using System.Collections.Frozen;
 using Microsoft.EntityFrameworkCore;
 using MindMapper.WebApi.Data;
 using MindMapper.WebApi.Data.Entities;

@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
-
-namespace MindMapper.WebApi.Models
+﻿namespace MindMapper.WebApi.Models
 {
 
     public class FileDetails

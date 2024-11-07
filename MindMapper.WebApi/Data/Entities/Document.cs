@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MindMapper.WebApi.Data.Entities;
 
 public class Document

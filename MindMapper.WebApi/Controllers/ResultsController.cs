@@ -1,7 +1,5 @@
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using MindMapper.WebApi.Dto;
-using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
 
 namespace MindMapper.WebApi.Controllers;
@@ -38,16 +36,12 @@ public partial class ResultsController
     }
 
     [HttpGet("GetAllDocuments")]
-    public async Task<IReadOnlyCollection<GetDocumentTopicsResultDto>> GetAllDocuments()
+    public async Task<IReadOnlyCollection<GetDocumentsDto>> GetAllDocuments()
     {
         var documents = await _topicsService.GetAllDocuments();
-        return documents.Select(result => new GetDocumentTopicsResultDto(
+        return documents.Select(result => new GetDocumentsDto(
             IsReady: result.IsReady,
-            DocumentId: result.DocumentId,
-            Name: result.Name,
-            Topics: result
-                .Topics
-                .Select(x => new DocumentTopicsDto(x.Id, x.Name, x.Text))
-                .ToArray())).ToArray();
+            Id: result.DocumentId,
+            Name: result.Name)).ToArray();
     }
 }

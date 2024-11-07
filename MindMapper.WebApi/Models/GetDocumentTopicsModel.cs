@@ -1,5 +1,3 @@
-using MindMapper.WebApi.Data.Entities;
-
 namespace MindMapper.WebApi.Models;
 
 public record DocumentModel(long DocumentId, string Name, IReadOnlyCollection<TopicModel> Topics, bool IsReady);
