@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using MindMapper.WebApi.Dto;
+using MindMapper.WebApi.Options;
 using MindMapper.WebApi.Services.Interfaces;
+using YandexGPTWrapper;
 
 namespace MindMapper.WebApi.Controllers;
 
@@ -9,10 +12,12 @@ namespace MindMapper.WebApi.Controllers;
 public class ResultsController
 {
     private readonly ITopicsService _topicsService;
+    private readonly IGptService _gptService;
 
-    public ResultsController(ITopicsService topicsService)
+    public ResultsController(ITopicsService topicsService, IGptService gptService)
     {
         _topicsService = topicsService;
+        _gptService = gptService;
     }
     
     [HttpGet("/getDocumentTopics")]
@@ -32,5 +37,11 @@ public class ResultsController
                 .Select(x => new DocumentTopics(x.Id, x.Name, x.Text))
                 .ToArray()
         );
+    }
+
+    [HttpGet("/queryGpt")]
+    public async Task<string> QueryYandexGpt([FromQuery] string prompt, CancellationToken token)
+    {
+        return await _gptService.QueryPrompt(prompt, token);
     }
 }
