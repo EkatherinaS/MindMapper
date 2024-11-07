@@ -25,6 +25,8 @@ builder.Services.AddHttpClient();
 
 builder.Services.AddHostedService<DocumentHostedService>();
 
+builder.Services.AddCors();
+
 builder.Services.Configure<YandexGptOptions>(builder.Configuration.GetRequiredSection("YandexGptOptions"));
 builder.Services.Configure<FileOptions>(builder.Configuration.GetRequiredSection("FileOptions"));
 
@@ -40,6 +42,8 @@ app.Use(async (context, next) =>
 
     await next.Invoke();
 });
+
+app.UseCors(o => o.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
