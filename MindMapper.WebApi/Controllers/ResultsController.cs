@@ -1,15 +1,14 @@
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
 using MindMapper.WebApi.Dto;
-using MindMapper.WebApi.Options;
+using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
-using YandexGPTWrapper;
 
 namespace MindMapper.WebApi.Controllers;
 
 [ApiController]
 [Route("/results")]
-public class ResultsController
+public partial class ResultsController
 {
     private readonly ITopicsService _topicsService;
     private readonly IGptService _gptService;
@@ -44,4 +43,28 @@ public class ResultsController
     {
         return await _gptService.QueryPrompt(prompt, token);
     }
+
+    [HttpPost("/queryInstructionGpt")]
+    public async Task<string> QueryInstructionYandexGpt([FromBody] QueryInstructionGptDto dto, CancellationToken token)
+    {
+        var instruction = WhitespaceReplacement().Replace(dto.Instruction, " ");
+        var prompt = WhitespaceReplacement().Replace(dto.Prompt, " ");
+        return await _gptService.QueryInstruction(instruction, prompt, token);
+    }
+
+    [HttpPost("/queryTopics")]
+    public async Task<IReadOnlyCollection<TopicModel>> QueryTopics([FromBody] QueryTopicsFromTextDto dto, CancellationToken token)
+    {
+        var result = await _gptService.QueryTopics(dto.Text, token);
+        return result;
+    }
+
+    [HttpPost("/enrichTopic")]
+    public async Task<string> GetTopicExplanation([FromBody] GetTopicExplanationDto dto, CancellationToken token)
+    {
+        return await _gptService.EnrichTopic(dto.Prompt, dto.Name, token);
+    }
+    
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceReplacement();
 }
