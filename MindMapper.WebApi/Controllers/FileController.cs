@@ -24,12 +24,12 @@ namespace MindMapper.WebApi.Controllers
         [HttpPost("PostSingleFile")]
         public async Task<ActionResult> PostSingleFile([FromForm] FileUploadModel fileDetails)
         {
-            if (fileDetails?.FileDetails == null || !fileDetails.FileDetails.FileName.EndsWith(".pdf"))
+            if (fileDetails?.File == null || !fileDetails.File.FileName.EndsWith(".pdf"))
             {
                 return BadRequest();
             }
 
-            await _uploadService.PostFileAsync(fileDetails.FileDetails);
+            await _uploadService.PostFileAsync(fileDetails.File);
             return Ok();
         }
 
@@ -41,7 +41,7 @@ namespace MindMapper.WebApi.Controllers
         [HttpPost("PostMultipleFile")]
         public async Task<ActionResult> PostMultipleFile([FromForm] List<FileUploadModel> fileDetails)
         {
-            if (fileDetails.Any(x => x.FileDetails is null) || fileDetails.Any(x => !x.FileDetails.FileName.EndsWith(".pdf")))
+            if (fileDetails.Any(x => x.File is null) || fileDetails.Any(x => !x.File.FileName.EndsWith(".pdf")))
             {
                 return BadRequest();
             }

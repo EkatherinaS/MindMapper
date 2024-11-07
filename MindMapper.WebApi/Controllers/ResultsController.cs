@@ -30,7 +30,7 @@ public partial class ResultsController
             Name: result.Name,
             Topics: result
                 .Topics
-                .Select(x => new DocumentTopicsDto(x.Id, x.Name, x.Text))
+                .Select(x => new DocumentTopicsDto(x.Id, x.Name, x.Text, x.PreviousTopicId))
                 .ToArray()
         );
     }

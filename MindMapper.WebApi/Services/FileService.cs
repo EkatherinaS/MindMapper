@@ -46,7 +46,7 @@ public class FileService : IFileService
 
     public async Task PostMultiFileAsync(List<FileUploadModel> fileData)
     {
-        var tasks = fileData.Select(file => PostFileAsync(file.FileDetails));
+        var tasks = fileData.Select(file => PostFileAsync(file.File));
         await Task.WhenAll(tasks);
     }
 
