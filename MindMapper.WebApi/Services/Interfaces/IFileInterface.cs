@@ -4,7 +4,7 @@ namespace MindMapper.WebApi.Services.Interfaces
 {
     public interface IFileService
     {
-        public Task PostFileAsync(IFormFile fileData);
+        public Task<long> PostFileAsync(IFormFile fileData);
 
         public Task PostMultiFileAsync(List<FileUploadModel> fileData);
 

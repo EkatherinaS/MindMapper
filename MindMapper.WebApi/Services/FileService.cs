@@ -22,7 +22,7 @@ public class FileService : IFileService
         _context = context;
     }
 
-    public async Task PostFileAsync(IFormFile fileData)
+    public async Task<long> PostFileAsync(IFormFile fileData)
     {
         var newName = $"{Guid.NewGuid()}.pdf";
         var originalName = fileData.FileName;
@@ -40,8 +40,9 @@ public class FileService : IFileService
             OriginalName = originalName
         };
 
-        await _context.Documents.AddAsync(document);
+        var documentEntry = await _context.Documents.AddAsync(document);
         await _context.SaveChangesAsync();
+        return documentEntry.Entity.Id;
     }
 
     public async Task PostMultiFileAsync(List<FileUploadModel> fileData)

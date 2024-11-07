@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MindMapper.WebApi.Dto;
 using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
 
@@ -22,6 +23,8 @@ namespace MindMapper.WebApi.Controllers
         /// <param name="file"></param>
         /// <returns></returns>
         [HttpPost("PostSingleFile")]
+        [ProducesResponseType<LoadDocumentDto>(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> PostSingleFile([FromForm] FileUploadModel fileDetails)
         {
             if (fileDetails?.File == null || !fileDetails.File.FileName.EndsWith(".pdf"))
@@ -29,8 +32,8 @@ namespace MindMapper.WebApi.Controllers
                 return BadRequest();
             }
 
-            await _uploadService.PostFileAsync(fileDetails.File);
-            return Ok();
+            var documentId = await _uploadService.PostFileAsync(fileDetails.File);
+            return new JsonResult(new LoadDocumentDto(documentId));
         }
 
         /// <summary>
