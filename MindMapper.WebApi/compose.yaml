@@ -10,6 +10,6 @@ services:
     environment:
       POSTGRES_USER: 'pguser'
       POSTGRES_PASSWORD: 'pguserpass'
-      POSTGRES_DB: 'tennis_db'
+      POSTGRES_DB: 'mindmapper_db'
     networks:
       - db-accesss
