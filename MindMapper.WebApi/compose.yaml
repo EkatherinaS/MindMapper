@@ -1,11 +1,15 @@
 services:
-  mind-mapper-back:
-    build: .
-    container_name: mind-mapper-back
+  database:
+    container_name: database_mindmapper
+    image: postgres:16.0
     restart: unless-stopped
+    volumes:
+      - /home/worker/pgdata:/var/lib/postgresql/data/
     ports:
       - 54401:5432
     environment:
-      ASPNETCORE_ENVIRONMENT: Development
-
-
+      POSTGRES_USER: 'pguser'
+      POSTGRES_PASSWORD: 'pguserpass'
+      POSTGRES_DB: 'tennis_db'
+    networks:
+      - db-accesss
