@@ -74,7 +74,7 @@ public sealed class DocumentHostedService : IHostedService,  IDisposable
                     var inEnrichedPreviousTopicId = enrichedTopics[i].PreviousTopicId;
                     if (inEnrichedPreviousTopicId is not null)
                     {
-                        topic.PreviousTopicId = topics[inEnrichedPreviousTopicId.Value].Id;
+                        topic.PreviousTopicId = dbTopics[inEnrichedPreviousTopicId.Value].Id;
                     }
 
                     topic.AnalysisCompleted = true;
