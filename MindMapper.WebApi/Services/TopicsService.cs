@@ -28,7 +28,7 @@ public class TopicsService : ITopicsService
 
         return new DocumentModel(
             DocumentId: document.Id,
-            IsReady: document.Topics.All(x => x.AnalysisCompleted),
+            IsReady: document.Topics.Count > 0 && document.Topics.All(x => x.AnalysisCompleted),
             Name: document.OriginalName,
             Topics: document
                 .Topics
@@ -45,7 +45,7 @@ public class TopicsService : ITopicsService
 
         return documents.Select(document => new DocumentModel(
             DocumentId: document.Id,
-            IsReady: document.Topics.All(x => x.AnalysisCompleted),
+            IsReady: document.Topics.Count > 0 && document.Topics.All(x => x.AnalysisCompleted),
             Name: document.OriginalName,
             Topics: document
                 .Topics
