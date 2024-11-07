@@ -20,4 +20,8 @@
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0"/>
         <Reference Include="YandexGPTWrapper.dll"/>
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Data\Migrations\" />
+    </ItemGroup>
 </Project>

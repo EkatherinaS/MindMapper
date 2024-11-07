@@ -36,4 +36,18 @@ public partial class ResultsController
                 .ToArray()
         );
     }
+
+    [HttpGet("GetAllDocuments")]
+    public async Task<IReadOnlyCollection<GetDocumentTopicsResultDto>> GetAllDocuments()
+    {
+        var documents = await _topicsService.GetAllDocuments();
+        return documents.Select(result => new GetDocumentTopicsResultDto(
+            IsReady: result.IsReady,
+            DocumentId: result.DocumentId,
+            Name: result.Name,
+            Topics: result
+                .Topics
+                .Select(x => new DocumentTopicsDto(x.Id, x.Name, x.Text))
+                .ToArray())).ToArray();
+    }
 }

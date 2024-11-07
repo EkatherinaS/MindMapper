@@ -36,4 +36,21 @@ public class TopicsService : ITopicsService
                 .ToArray()
         );
     }
+
+    public async Task<IReadOnlyCollection<DocumentModel>> GetAllDocuments()
+    {
+        var documents = await _context.Documents
+            .Include(x => x.Topics)
+            .ToArrayAsync();
+
+        return documents.Select(document => new DocumentModel(
+            DocumentId: document.Id,
+            IsReady: document.Topics.All(x => x.AnalysisCompleted),
+            Name: document.OriginalName,
+            Topics: document
+                .Topics
+                .Select(x => new TopicModel(x.Id, x.Name, x.Text, x.PreviousTopicId))
+                .ToArray()
+        )).ToArray();
+    }
 }

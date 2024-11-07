@@ -44,22 +44,12 @@ namespace MindMapper.WebApi.Data.Migrations
                         principalTable: "Documents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Topics_Topics_PreviousTopicId",
-                        column: x => x.PreviousTopicId,
-                        principalTable: "Topics",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Topics_DocumentId",
                 table: "Topics",
                 column: "DocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Topics_PreviousTopicId",
-                table: "Topics",
-                column: "PreviousTopicId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

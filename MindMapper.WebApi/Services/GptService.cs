@@ -12,13 +12,16 @@ public sealed class GptService : IGptService
 {
     private readonly IOptions<YandexGptOptions> _yandexGptOptions;
     private readonly IHttpClientFactory _httpClientFactory;
-    private string ModelUrl => $"gpt://{_yandexGptOptions.Value.Folder}/yandexgpt/latest";
+    private readonly ILogger<GptService> _logger;
+    
+    private string ModelUrl => $"gpt://{_yandexGptOptions.Value.Folder}/yandexgpt-lite/latest";
     private string QueryUrl => "https://llm.api.cloud.yandex.net/foundationModels/v1/completion";
 
-    public GptService(IOptions<YandexGptOptions> yandexGptOptions, IHttpClientFactory httpClientFactory)
+    public GptService(IOptions<YandexGptOptions> yandexGptOptions, IHttpClientFactory httpClientFactory, ILogger<GptService> logger)
     {
         _yandexGptOptions = yandexGptOptions;
         _httpClientFactory = httpClientFactory;
+        _logger = logger;
     }
     
     public async Task<string> QueryPrompt(string prompt, CancellationToken cancellationToken)
@@ -125,7 +128,7 @@ public sealed class GptService : IGptService
                                    " Не используй нумерацию ни прикаких условиях. Не нумеруй строки. " +
                                    "Не пиши цифры в начале строки. Ничего кроме этого писать не нужно.";
         
-        var regex = new Regex("[^а-яА-Яё ]");
+        var regex = new Regex("[^а-яА-ЯёË ]");
         var result = await QueryInstruction(instruction, prompt, token);
 
         var lines = result
@@ -133,21 +136,21 @@ public sealed class GptService : IGptService
             .Select(x => regex.Replace(x, string.Empty))
             .ToArray();
 
-        const double rootProbability = 0.3;
+        const double rootProbability = 0.1;
 
-        var list = new List<TopicModel> { new(0, lines[0], string.Empty, null) };
+        var list = new List<TopicModel> { new(0, lines[0].Trim(), string.Empty, null) };
         
         for (var i = 1; i < lines.Length; i++)
         {
             var isRoot = Random.Shared.NextSingle() < rootProbability;
             if (isRoot)
             {
-                list.Add(new TopicModel(i, lines[i], string.Empty, null));
+                list.Add(new TopicModel(i, lines[i].Trim(), string.Empty, null));
             }
             else
             {
                 var randomId = Random.Shared.Next(0, list.Count);
-                list.Add(new TopicModel(i, lines[i], string.Empty, randomId));
+                list.Add(new TopicModel(i, lines[i].Trim(), string.Empty, randomId));
             }
         }
 
@@ -156,8 +159,14 @@ public sealed class GptService : IGptService
 
     public async Task<IReadOnlyCollection<TopicModel>> EnrichTopics(string prompt, IReadOnlyCollection<TopicModel> topics, CancellationToken cancellationToken)
     {
-        var tasks = topics.Select(x => EnrichTopic(prompt, x.Name, cancellationToken));
-        var results = await Task.WhenAll(tasks);
+        var results = new List<string>();
+        foreach (var topic in topics)
+        {
+            _logger.LogInformation($"Наполняем топик '{topic.Name}'");
+            results.Add(await EnrichTopic(prompt, topic.Name, cancellationToken));
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+        }
+        
         return topics.Select((x, i) => x with { Text = results[i] }).ToArray();
     }
 

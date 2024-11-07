@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MindMapper.WebApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20241106093932_Initial")]
+    [Migration("20241107173300_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,8 +74,6 @@ namespace MindMapper.WebApi.Data.Migrations
 
                     b.HasIndex("DocumentId");
 
-                    b.HasIndex("PreviousTopicId");
-
                     b.ToTable("Topics");
                 });
 
@@ -87,13 +85,7 @@ namespace MindMapper.WebApi.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MindMapper.WebApi.Data.Entities.Topic", "PreviousTopic")
-                        .WithMany()
-                        .HasForeignKey("PreviousTopicId");
-
                     b.Navigation("Document");
-
-                    b.Navigation("PreviousTopic");
                 });
 
             modelBuilder.Entity("MindMapper.WebApi.Data.Entities.Document", b =>

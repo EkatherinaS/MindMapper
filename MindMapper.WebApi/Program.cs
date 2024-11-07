@@ -1,28 +1,17 @@
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using MindMapper.WebApi.Data;
-using MindMapper.WebApi.Data.Entities;
+using MindMapper.WebApi.HostedServices;
 using MindMapper.WebApi.Options;
-using MindMapper.WebApi.Services;
-using MindMapper.WebApi.Services.Interfaces;
 using MindMapper.WebApi.Services;
 using MindMapper.WebApi.Services.Interfaces;
 using FileOptions = MindMapper.WebApi.Options.FileOptions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-builder.Services.AddScoped<ITopicsService, TopicsService>();
-builder.Services.AddSingleton<IGptService, GptService>();
-builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -30,11 +19,27 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 });
 
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<ITopicsService, TopicsService>();
+builder.Services.AddScoped<IGptService, GptService>();
+builder.Services.AddHttpClient();
+
+builder.Services.AddHostedService<DocumentHostedService>();
 
 builder.Services.Configure<YandexGptOptions>(builder.Configuration.GetRequiredSection("YandexGptOptions"));
 builder.Services.Configure<FileOptions>(builder.Configuration.GetRequiredSection("FileOptions"));
 
 var app = builder.Build();
+
+app.Use(async (context, next) =>
+{
+    var feature = context.Features.Get<IHttpMaxRequestBodySizeFeature>();
+    if (feature != null)
+    {
+        feature.MaxRequestBodySize = int.MaxValue;
+    }
+
+    await next.Invoke();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -48,5 +53,6 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 app.Run();

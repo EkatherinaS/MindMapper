@@ -1,8 +1,12 @@
-﻿using MindMapper.WebApi.Models;
+﻿using System.Text;
+using System.Text.RegularExpressions;
+using Microsoft.EntityFrameworkCore;
+using MindMapper.WebApi.Models;
 using MindMapper.WebApi.Services.Interfaces;
 using Microsoft.Extensions.Options;
 using MindMapper.WebApi.Data;
 using MindMapper.WebApi.Data.Entities;
+using UglyToad.PdfPig;
 using FileOptions = MindMapper.WebApi.Options.FileOptions;
 
 namespace MindMapper.WebApi.Services;
@@ -44,5 +48,34 @@ public class FileService : IFileService
     {
         var tasks = fileData.Select(file => PostFileAsync(file.FileDetails));
         await Task.WhenAll(tasks);
+    }
+
+    public async Task<string?> GetFileContents(long id, CancellationToken token)
+    {
+        var file = await _context.Documents.FirstOrDefaultAsync(x => x.Id == id, token);
+        if (file is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            var filepath = Path.Combine(_fileOptions.Value.SavePath, file.SavedName);
+            using var pdf = PdfDocument.Open(filepath);
+
+
+            var builder = new StringBuilder();
+            foreach (var page in pdf.GetPages())
+            {
+                var text = Regex.Replace(page.Text, @"[^\d\w ]", string.Empty, RegexOptions.Compiled);
+                builder.Append(text);
+            }
+            
+            return builder.ToString();
+        }
+        catch (Exception _)
+        {
+            return null;
+        }
     }
 }

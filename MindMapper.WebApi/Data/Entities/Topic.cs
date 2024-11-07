@@ -14,8 +14,6 @@ public class Topic
     
     public long? PreviousTopicId { get; set; }
     
-    public Topic? PreviousTopic { get; set; }
-    
     [DefaultValue(false)]
     public bool AnalysisCompleted { get; set; }
     
